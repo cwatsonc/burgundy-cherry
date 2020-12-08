@@ -5,17 +5,17 @@ import { Local } from "boardgame.io/multiplayer";
 import { Stage } from "boardgame.io/core";
 import BoardView from "./BoardView";
 
-const endStage = (_: any, ctx: Ctx) => {
+const endStage = (G: any, ctx: Ctx) => {
   console.log(
     ctx.playerID,
     " enters endStage with: ",
-    _.dealerChoice,
+    G.dealerChoice,
     " in dealerChoice"
   );
   console.log(ctx.playOrderPos);
 
-  _.dealerChoice = _.dealerChoice
-    ? _.dealerChoice
+  G.dealerChoice = G.dealerChoice
+    ? G.dealerChoice
     : ctx.playerID === "0"
       ? "northDealer"
       : "southDealer";
