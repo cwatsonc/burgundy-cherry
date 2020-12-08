@@ -1,11 +1,16 @@
 import React from "react";
-import { Ctx } from "boardgame.io";
+import { Ctx, Game } from "boardgame.io";
 import { Client } from "boardgame.io/react";
 import { Local } from "boardgame.io/multiplayer";
 import { Stage } from "boardgame.io/core";
 import BoardView from "./BoardView";
 
-const endStage = (G: any, ctx: Ctx) => {
+interface IGameState {
+  dealWasPassed: boolean,
+  dealerChoice: string,
+}
+
+const endStage = (G: IGameState, ctx: Ctx) => {
   console.log(
     ctx.playerID,
     " enters endStage with: ",
@@ -21,31 +26,19 @@ const endStage = (G: any, ctx: Ctx) => {
       : "southDealer";
   ctx?.events?.endStage?.();
 };
-const endTurn = (G: IGame, ctx: Ctx): void => {
+const endTurn = (G: IGameState, ctx: Ctx): void => {
   G.dealWasPassed = true;
   ctx.events?.endTurn?.();
 };
-const benign = (G: IGame, ctx: Ctx) => {
+const benign = (G: IGameState, ctx: Ctx) => {
   console.log(ctx.playerID);
   console.log("just visiting");
 };
 
-interface IMoves {
-  endStage: (G: IGame, ctx: Ctx) => void,
-  endTurn: (G: IGame, ctx: Ctx) => void,
-  benign: (G: IGame, ctx: Ctx) => void,
-}
-const moves: IMoves = { endStage, endTurn, benign };
 
-interface IGame {
-  dealWasPassed: boolean,
-  dealerChoice: string,
-  name: string,
-  moves: IMoves,
-  turn: any,
-  phases: any,
-}
-const game: IGame = {
+const moves = { endStage, endTurn, benign };
+
+const game: Game = {
   name: "cardtable",
   moves,
 
@@ -62,7 +55,7 @@ const game: IGame = {
           }
         }
       },
-      endIf: (G: IGame, ctx: Ctx) => {
+      endIf: (G: IGameState, ctx: Ctx) => {
         console.log(
           `inside Pregame endIf with activePlayers`,
           ctx.activePlayers,
@@ -78,29 +71,29 @@ const game: IGame = {
           }
           : false;
       },
-      onBegin(G: IGame, ctx: Ctx) {
+      onBegin(G: IGameState, ctx: Ctx) {
         return { ...G, dealerChoice: null }
       },
-      onEnd(G: IGame, ctx: Ctx) {
+      onEnd(G: IGameState, ctx: Ctx) {
         return { ...G, dealerChoice: null }
       }
     },
     northDealer: {
       moves,
-      onBegin: (G: IGame, ctx: Ctx) => {
+      onBegin: (G: IGameState, ctx: Ctx) => {
         return { ...G, dealWasPassed: false }
       },
-      onEnd: (G: IGame, ctx: Ctx) => {
+      onEnd: (G: IGameState, ctx: Ctx) => {
         return { ...G, dealWasPassed: false }
       },
       turn: {
         order: {
-          first: (G: IGame, ctx: Ctx) => 0,
-          next: (G: IGame, ctx: Ctx) => (ctx.playOrderPos === 1 ? 0 : 1)
+          first: (G: IGameState, ctx: Ctx) => 0,
+          next: (G: IGameState, ctx: Ctx) => (ctx.playOrderPos === 1 ? 0 : 1)
         },
         activePlayers: { all: Stage.NULL }
       },
-      endIf: (G: IGame, ctx: Ctx) =>
+      endIf: (G: IGameState, ctx: Ctx) =>
         G.dealWasPassed && ctx.phase === "northDealer"
           ? {
             next: "southDealer"
@@ -111,12 +104,12 @@ const game: IGame = {
       moves,
       turn: {
         order: {
-          first: (G: IGame, ctx: Ctx) => 1,
-          next: (G: IGame, ctx: Ctx) => (ctx.playOrderPos === 1 ? 0 : 1)
+          first: (G: IGameState, ctx: Ctx) => 1,
+          next: (G: IGameState, ctx: Ctx) => (ctx.playOrderPos === 1 ? 0 : 1)
         },
         activePlayers: { all: Stage.NULL }
       },
-      endIf: (G: IGame, ctx: Ctx) =>
+      endIf: (G: IGameState, ctx: Ctx) =>
         G.dealWasPassed && ctx.phase === "southDealer"
           ? {
             next: "northDealer"
