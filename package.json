@@ -12,7 +12,8 @@
     "react-scripts": "3.0.1"
   },
   "devDependencies": {
-    "typescript": "3.8.3"
+    "typescript": "3.8.3",
+    "@types/jest": "^26.0.18"
   },
   "scripts": {
     "start": "react-scripts start",

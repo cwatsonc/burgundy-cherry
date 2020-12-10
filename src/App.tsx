@@ -5,7 +5,7 @@ import { Local } from "boardgame.io/multiplayer";
 import { Stage } from "boardgame.io/core";
 import BoardView from "./BoardView";
 
-interface IGameState {
+export interface IGameState {
   dealWasPassed: boolean,
   dealerChoice: string,
 }
@@ -36,9 +36,9 @@ const benign = (G: IGameState, ctx: Ctx) => {
 };
 
 
-const moves = { endStage, endTurn, benign };
+export const moves = { endStage, endTurn, benign };
 
-const game: Game = {
+export const game: Game = {
   name: "cardtable",
   moves,
 
@@ -56,12 +56,7 @@ const game: Game = {
         }
       },
       endIf: (G: IGameState, ctx: Ctx) => {
-        console.log(
-          `inside Pregame endIf with activePlayers`,
-          ctx.activePlayers,
-          `and dealerChoice: `,
-          G.dealerChoice
-        );
+
         return ctx.activePlayers === null && G.dealerChoice
           ? {
             next:
